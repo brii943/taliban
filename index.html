@@ -277,7 +277,7 @@ footer {
 <body>
 <header class="navbar">
   <div class="logo">NEXUS <span>PREDICT</span></div>
-  <div class="balance">Demo points: <strong id="balance">1,000</strong></div>
+  <div class="balance">Demo points: <strong id="balance">10,000</strong></div>
 </header>
 
 <main class="container">
@@ -293,7 +293,7 @@ footer {
       <span class="status">● DEMO MODE</span>
     </div>
 
-    <div class="timer">Round ends in <strong id="timer">30</strong>s</div>
+    <div class="timer">Round ends in <strong id="timer">7</strong>s</div>
     <p class="instruction">Choose a number from 0 to 9</p>
 
     <div class="number-grid" id="numberGrid">
@@ -341,16 +341,16 @@ footer {
 "use strict";
 
 // ===== GAME STATE =====
-let balance = 1000;
+let balance = 10000;
 let selectedNumber = null;
 let roundActive = false;
-let timeLeft = 30;
+let timeLeft = 7;
 let history = [];
 let timerInterval = null;
 let soundEnabled = true;
 let audioContext = null;
 
-const ROUND_SECONDS = 30;
+const ROUND_SECONDS = 7;
 const PAYOUT_MULTIPLIER = 9;
 
 // ===== ELEMENTS =====
