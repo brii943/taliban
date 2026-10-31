@@ -471,7 +471,7 @@ playButton.addEventListener("click", () => {
 // ===== RESOLVE ROUND =====
 function finishRound(stake) {
   const prediction = selectedNumber;
-  const result = Math.floor(Math.random() * 15);
+  const result = Math.floor(Math.random() * 10);
   const won = result === prediction;
   const payout = won ? stake * PAYOUT_MULTIPLIER : 0;
 
