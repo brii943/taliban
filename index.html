@@ -1,1 +1,569 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050b16">
+<title>NEXUS PREDICT</title>
+
+<style>
+:root {
+  --bg: #050b16;
+  --card: #0c1728;
+  --border: #203650;
+  --green: #00f5a0;
+  --text: #f2f6ff;
+  --muted: #91a4bd;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+button, input { font: inherit; }
+button { touch-action: manipulation; }
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 18px 6%;
+  background: #081222;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 21px; font-weight: 900; letter-spacing: 1px; }
+.logo span, .hero h2 span { color: var(--green); }
+.balance {
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 13px;
+  font-size: 13px;
+}
+.balance strong { color: var(--green); }
+
+.container { width: min(760px, 92%); margin: 28px auto; }
+
+.hero {
+  padding: 30px 24px;
+  border: 1px solid #175044;
+  border-radius: 17px;
+  margin-bottom: 20px;
+  background:
+    radial-gradient(circle at top right, #174b40, transparent 55%),
+    linear-gradient(135deg, #101f33, #081222);
+}
+.tag {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+.hero h2 { font-size: clamp(28px, 6vw, 42px); line-height: 1.2; margin: 10px 0; }
+.hero p:last-child { color: var(--muted); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.heading h2, .card h2 { font-size: 20px; }
+.status {
+  color: var(--green);
+  font-size: 11px;
+  border: 1px solid #17644c;
+  border-radius: 20px;
+  padding: 4px 9px;
+}
+.timer {
+  text-align: center;
+  color: var(--muted);
+  background: #07111f;
+  border-radius: 10px;
+  margin: 20px 0;
+  padding: 12px;
+}
+.timer strong { color: var(--green); font-size: 24px; margin-left: 6px; }
+
+.instruction { color: var(--muted); margin-bottom: 12px; }
+
+.number-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 23px;
+}
+.number {
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 1px solid #29415e;
+  border-radius: 12px;
+  background: #101f34;
+  color: var(--text);
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+.number:hover, .number.selected {
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 16px #00f5a025;
+}
+.number.selected { background: #0b3027; }
+.number:disabled { opacity: .55; cursor: not-allowed; }
+
+label { display: block; margin-bottom: 7px; font-size: 14px; }
+#stake {
+  width: 100%;
+  background: #07111f;
+  border: 1px solid #29415e;
+  color: var(--text);
+  border-radius: 9px;
+  padding: 12px;
+  outline: none;
+  margin-bottom: 16px;
+}
+#stake:focus { border-color: var(--green); }
+
+.play-button {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--green);
+  color: #03150e;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+.play-button:hover { background: #70ffca; }
+.play-button:disabled { opacity: .55; cursor: not-allowed; }
+
+.result-reveal {
+  text-align: center;
+  padding: 20px 10px;
+  margin: 20px 0;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: radial-gradient(circle, #12332f, #07111f 75%);
+}
+.result-label { color: var(--muted); font-size: 11px; letter-spacing: 3px; }
+.result-number {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  margin: 12px auto;
+  border: 2px solid var(--green);
+  border-radius: 18px;
+  background: #061b18;
+  color: var(--green);
+  font-size: 36px;
+  font-weight: bold;
+  box-shadow: 0 0 20px #00f5a025;
+}
+.result-number.reveal { animation: reveal .6s ease; }
+.result-number.winner { background: var(--green); color: #03150e; }
+@keyframes reveal {
+  0% { transform: scale(.6) rotate(-10deg); opacity: .3; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+#resultCaption { color: var(--muted); font-size: 13px; }
+
+.message {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 9px;
+  text-align: center;
+  background: #07111f;
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.sound-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.sound-toggle {
+  padding: 7px 12px;
+  color: var(--green);
+  background: #101f34;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.recent-strip {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 14px 0;
+}
+.recent-chip {
+  flex: 0 0 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #07111f;
+  font-weight: bold;
+  font-size: 19px;
+}
+.recent-chip.latest { color: var(--green); border-color: var(--green); }
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.history-item:last-child { border-bottom: 0; }
+.history-item span { color: var(--muted); }
+.history-item strong { text-align: right; color: var(--green); }
+
+footer {
+  text-align: center;
+  padding: 15px 5px 30px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .navbar { padding: 15px 4%; }
+  .logo { font-size: 18px; }
+  .container { width: 94%; margin: 20px auto; }
+  .hero { padding: 23px 17px; }
+  .card { padding: 16px; }
+  .number-grid { gap: 7px; }
+  .number { font-size: 22px; border-radius: 9px; }
+  .history-item { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="navbar">
+  <div class="logo">NEXUS <span>PREDICT</span></div>
+  <div class="balance">Demo points: <strong id="balance">1,000</strong></div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <p class="tag">NUMBER CHALLENGE</p>
+    <h2>Trust your <span>instinct.</span></h2>
+    <p>Pick a number. Test your prediction skills.</p>
+  </section>
+
+  <section class="card">
+    <div class="heading">
+      <h2>Number Prediction</h2>
+      <span class="status">● DEMO MODE</span>
+    </div>
+
+    <div class="timer">Round ends in <strong id="timer">30</strong>s</div>
+    <p class="instruction">Choose a number from 0 to 9</p>
+
+    <div class="number-grid" id="numberGrid">
+      <button class="number" data-number="0">0</button>
+      <button class="number" data-number="1">1</button>
+      <button class="number" data-number="2">2</button>
+      <button class="number" data-number="3">3</button>
+      <button class="number" data-number="4">4</button>
+      <button class="number" data-number="5">5</button>
+      <button class="number" data-number="6">6</button>
+      <button class="number" data-number="7">7</button>
+      <button class="number" data-number="8">8</button>
+      <button class="number" data-number="9">9</button>
+    </div>
+
+    <label for="stake">Practice points</label>
+    <input id="stake" type="number" min="1" max="1000" step="1" value="10">
+
+    <button id="playButton" class="play-button">Play Demo Round</button>
+
+    <div class="result-reveal">
+      <span class="result-label">LATEST RESULT</span>
+      <div id="resultNumber" class="result-number">?</div>
+      <p id="resultCaption">Your result will appear here</p>
+    </div>
+
+    <p id="message" class="message" aria-live="polite">Select a number to begin.</p>
+
+    <div class="sound-row">
+      <span>Game sounds</span>
+      <button id="soundToggle" class="sound-toggle" aria-pressed="true">🔊 On</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Recent Results</h2>
+    <div id="recentStrip" class="recent-strip"></div>
+    <div id="history"><p class="instruction">No rounds played yet.</p></div>
+  </section>
+
+  <footer>Educational demo · Virtual points only · No real-money betting</footer>
+</main>
+
+<script>
+"use strict";
+
+// ===== GAME STATE =====
+let balance = 1000;
+let selectedNumber = null;
+let roundActive = false;
+let timeLeft = 30;
+let history = [];
+let timerInterval = null;
+let soundEnabled = true;
+let audioContext = null;
+
+const ROUND_SECONDS = 30;
+const PAYOUT_MULTIPLIER = 9;
+
+// ===== ELEMENTS =====
+const balanceDisplay = document.getElementById("balance");
+const timerDisplay = document.getElementById("timer");
+const stakeInput = document.getElementById("stake");
+const playButton = document.getElementById("playButton");
+const messageDisplay = document.getElementById("message");
+const historyDisplay = document.getElementById("history");
+const recentStrip = document.getElementById("recentStrip");
+const resultNumber = document.getElementById("resultNumber");
+const resultCaption = document.getElementById("resultCaption");
+const soundToggle = document.getElementById("soundToggle");
+const numberButtons = document.querySelectorAll(".number");
+
+// ===== SOUND EFFECTS =====
+function playTone(frequency = 500, duration = 0.12) {
+  if (!soundEnabled) return;
+
+  try {
+    const AudioClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioClass) return;
+
+    if (!audioContext) audioContext = new AudioClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.07, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      0.001, audioContext.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration);
+  } catch (_) {
+    // The game works even when sound is unavailable.
+  }
+}
+
+soundToggle.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  soundToggle.textContent = soundEnabled ? "🔊 On" : "🔇 Off";
+  soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+  if (soundEnabled) playTone(600);
+});
+
+// ===== NUMBER SELECTION =====
+numberButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    if (roundActive) return;
+
+    numberButtons.forEach(item => item.classList.remove("selected"));
+    button.classList.add("selected");
+    selectedNumber = Number(button.dataset.number);
+
+    showMessage("You selected " + selectedNumber + ".");
+    playTone(500, 0.08);
+  });
+});
+
+// ===== START A ROUND =====
+playButton.addEventListener("click", () => {
+  if (roundActive) return;
+
+  if (selectedNumber === null) {
+    showMessage("Please select a number first.");
+    return;
+  }
+
+  const stake = Number(stakeInput.value);
+
+  if (!Number.isSafeInteger(stake) || stake < 1 || stake > 1000) {
+    showMessage("Enter a whole number from 1 to 1,000.");
+    return;
+  }
+
+  if (stake > balance) {
+    showMessage("Not enough demo points. Choose a smaller stake.");
+    return;
+  }
+
+  balance -= stake;
+  updateBalance();
+
+  roundActive = true;
+  timeLeft = ROUND_SECONDS;
+  timerDisplay.textContent = timeLeft;
+
+  playButton.disabled = true;
+  stakeInput.disabled = true;
+  numberButtons.forEach(button => button.disabled = true);
+
+  resultNumber.textContent = "?";
+  resultNumber.classList.remove("winner", "reveal");
+  resultCaption.textContent = "Waiting for the result...";
+
+  showMessage("Round started. Your prediction is " + selectedNumber + ".");
+  playTone(650);
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerDisplay.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      finishRound(stake);
+    }
+  }, 1000);
+});
+
+// ===== RESOLVE ROUND =====
+function finishRound(stake) {
+  const prediction = selectedNumber;
+  const result = Math.floor(Math.random() * 10);
+  const won = result === prediction;
+  const payout = won ? stake * PAYOUT_MULTIPLIER : 0;
+
+  balance += payout;
+  updateBalance();
+
+  history.unshift({ prediction, result, stake, payout, won });
+  history = history.slice(0, 10);
+
+  resultNumber.textContent = result;
+  resultNumber.classList.remove("winner", "reveal");
+  void resultNumber.offsetWidth;
+  resultNumber.classList.add("reveal");
+
+  resultCaption.textContent = won
+    ? "Your prediction matched!"
+    : "Your prediction was " + prediction + ".";
+
+  if (won) {
+    resultNumber.classList.add("winner");
+    showMessage("Correct! You received " + payout + " demo points.");
+    playTone(850, 0.3);
+  } else {
+    showMessage("The result was " + result + ". Try another demo round.");
+    playTone(300, 0.2);
+  }
+
+  renderHistory();
+
+  roundActive = false;
+  selectedNumber = null;
+  timeLeft = ROUND_SECONDS;
+  timerDisplay.textContent = ROUND_SECONDS;
+
+  playButton.disabled = false;
+  stakeInput.disabled = false;
+  numberButtons.forEach(button => {
+    button.disabled = false;
+    button.classList.remove("selected");
+  });
+}
+
+// ===== DISPLAY HELPERS =====
+function updateBalance() {
+  balanceDisplay.textContent = balance.toLocaleString("en-KE");
+}
+
+function showMessage(message) {
+  messageDisplay.textContent = message;
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  historyDisplay.replaceChildren();
+  recentStrip.replaceChildren();
+
+  if (history.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "instruction";
+    empty.textContent = "No rounds played yet.";
+    historyDisplay.appendChild(empty);
+    return;
+  }
+
+  history.forEach((round, index) => {
+    const chip = document.createElement("div");
+    chip.className = "recent-chip" + (index === 0 ? " latest" : "");
+    chip.textContent = round.result;
+    chip.title = round.won ? "Prediction matched" : "Prediction did not match";
+    recentStrip.appendChild(chip);
+
+    const item = document.createElement("div");
+    item.className = "history-item";
+
+    const details = document.createElement("span");
+    details.textContent =
+      "Picked " + round.prediction + " · Result " + round.result;
+
+    const outcome = document.createElement("strong");
+    outcome.textContent = round.won
+      ? "+" + round.payout + " points"
+      : "No payout";
+
+    item.append(details, outcome);
+    historyDisplay.appendChild(item);
+  });
+}
+
+// ===== INITIALIZE =====
+updateBalance();
+renderHistory();
+</script>
+</body>
+  </html>
+  
